@@ -54,8 +54,8 @@ public class OperationsTest {
     @Test
     public void testDivisionByZero(){
         try {
-            Operations.divide(sParameter.get(2), sParameter.get(3));
-            fail();
+            dResult = Operations.divide(sParameter.get(2), sParameter.get(3));
+            assertTrue((dResult!= Double.POSITIVE_INFINITY ) || (dResult!= Double.NEGATIVE_INFINITY));
         } catch (ArithmeticException e) {
             e.printStackTrace();
         }
