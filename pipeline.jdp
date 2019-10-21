@@ -1,0 +1,58 @@
+pipeline{
+    agent any 
+    stages{
+        stage("Clone remote repository"){
+            steps{
+                git url: 'https://github.com/camiloandresru/pruebaTecnicaDevco.git'             
+            }                     
+        }
+        stage("Compile"){
+            steps{
+                sh "./gradlew clean"
+                sh "./gradlew compileJava"       
+            }
+            post{
+                failure{
+                    echo "====Compilation error===="
+                }
+            }
+        }
+        stage("Run unit tests"){
+            steps{
+                sh "./gradlew test"
+                sh "./gradlew jacocoTestReport"
+            }
+            post{
+                failure{
+                    echo "====Unit tests failed===="
+                }
+            }
+        }
+        stage("Run static code analysis"){
+            steps{
+                withSonarQubeEnv("SonarQube") {
+                    sh './gradlew sonarqube'
+                }
+            }
+            post{
+                failure{
+                    echo "====Static code analysis failed===="
+                }
+            }
+        }
+        stage("Generate JAR file"){
+            steps{
+                sh "./gradlew jar"
+                sh "./gradlew javadoc"
+            }   
+        }
+    }
+    post{
+        success{
+            echo "========Pipeline executed successfully ========"
+        }
+        failure{
+            echo "========Pipeline execution failed========"
+        }
+    }
+}
